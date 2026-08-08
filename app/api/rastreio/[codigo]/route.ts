@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { codigo: string } }) {
+export async function GET(
+  request: Request, 
+  props: { params: Promise<{ codigo: string }> }
+) {
+  // 1. Resolve os parâmetros assíncronos (Exigência do Next.js)
+  const params = await props.params;
   const { codigo } = params;
 
-  // 1. Barreira de Segurança: Verifica se o código realmente chegou
+  // 2. Barreira de Segurança: Verifica se o código realmente chegou
   if (!codigo) {
     return NextResponse.json({ error: "Código de rastreio não fornecido." }, { status: 400 });
   }
 
   try {
-    // 2. Faz a comunicação direta com o servidor do Melhor Envio
+    // 3. Faz a comunicação direta com o servidor do Melhor Envio
     const response = await fetch("https://www.melhorenvio.com.br/api/v2/me/shipment/tracking", {
       method: "POST",
       headers: {
@@ -25,12 +30,12 @@ export async function GET(request: Request, { params }: { params: { codigo: stri
 
     const data = await response.json();
 
-    // 3. O Melhor Envio retorna um objeto onde a "chave" é o código do rastreio
+    // 4. O Melhor Envio retorna um objeto onde a "chave" é o código do rastreio
     // Ex: { "QH123456789BR": { tracking: "...", events: [...] } }
     // Aqui buscamos exatamente pelo código, e se falhar, pegamos o primeiro item da lista
     const trackingData = data[codigo] || data[Object.keys(data)[0]]; 
 
-    // 4. Retorna a linha do tempo ou uma lista vazia se for um objeto recém-postado
+    // 5. Retorna a linha do tempo ou uma lista vazia se for um objeto recém-postado
     if (trackingData && trackingData.events) {
       return NextResponse.json(trackingData.events);
     } else {
