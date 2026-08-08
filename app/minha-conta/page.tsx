@@ -329,7 +329,7 @@ export default function MinhaConta() {
                       <input 
                         value={form.whatsapp} 
                         onChange={(e) => setForm({...form, whatsapp: e.target.value})} 
-                        className={`w-full border p-3 rounded text-base md:text-sm bg-transparent text-white focus:outline-none focus:border-hb-gold transition-colors ${mostrarErros && !form.whatsapp ? 'border-red-500 bg-red-900/10' : 'border-gray-700')}`} 
+                        className={`w-full border p-3 rounded text-base md:text-sm bg-transparent text-white focus:outline-none focus:border-hb-gold transition-colors ${mostrarErros && !form.whatsapp ? 'border-red-500 bg-red-900/10' : 'border-gray-700'}`} 
                         placeholder="(00) 00000-0000" 
                       />
                     </div>
@@ -515,7 +515,7 @@ export default function MinhaConta() {
                               </div>
                             </div>
 
-                            {/* LINHA DO TEMPO (STEPPER) SCROLLÁVEL NO MOBILE */}
+                            {/* LINHA DO TEMPO (STEPPER) */}
                             <div>
                               <h4 className="text-[11px] md:text-sm font-light text-white uppercase tracking-widest mb-6 md:mb-8 text-center md:text-left">Status do Pedido</h4>
                               
