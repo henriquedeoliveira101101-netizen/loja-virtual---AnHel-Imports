@@ -5,20 +5,20 @@ export default function PaginaSobre() {
   return (
     <main className="min-h-screen bg-hb-black">
       {/* Banner */}
-      <section className="bg-hb-gray py-24 text-center px-6 border-b border-hb-black">
-        <Diamond size={32} className="text-hb-gold mx-auto mb-6" />
-        <h1 className="text-3xl md:text-5xl font-light text-white uppercase tracking-widest italic mb-4">
+      <section className="bg-hb-gray py-16 md:py-24 text-center px-4 md:px-6 border-b border-hb-black">
+        <Diamond size={32} className="text-hb-gold mx-auto mb-4 md:mb-6 w-6 h-6 md:w-8 md:h-8" />
+        <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-white uppercase tracking-widest italic mb-3 md:mb-4">
           Nossa História
         </h1>
-        <p className="text-hb-gold text-sm uppercase tracking-widest">A essência da HB Importados</p>
+        <p className="text-hb-gold text-[10px] md:text-sm uppercase tracking-widest">A essência da HB Importados</p>
       </section>
 
       {/* Conteúdo */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-2xl font-light uppercase tracking-widest text-white mb-8">
+      <section className="max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-20 text-center">
+        <h2 className="text-xl md:text-2xl font-light uppercase tracking-widest text-white mb-6 md:mb-8">
           Mais do que joias, um legado.
         </h2>
-        <div className="space-y-6 text-gray-400 leading-relaxed font-light text-sm md:text-base">
+        <div className="space-y-5 md:space-y-6 text-gray-400 leading-relaxed font-light text-sm md:text-base text-left md:text-center">
           <p>
             A <strong className="text-hb-gold font-normal">HB Importados</strong> nasceu da paixão por peças exclusivas e do desejo de trazer para o Brasil o que há de mais sofisticado no mercado mundial de joias. 
           </p>
@@ -30,12 +30,12 @@ export default function PaginaSobre() {
           </p>
         </div>
 
-        <div className="mt-16">
+        <div className="mt-12 md:mt-16">
           <Link 
             href="/colecoes" 
-            className="inline-flex items-center gap-3 bg-hb-gold text-hb-black px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-hb-goldLight transition-colors"
+            className="inline-flex items-center justify-center gap-2 md:gap-3 bg-hb-gold text-hb-black px-6 md:px-8 py-3 md:py-4 text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-hb-goldLight transition-colors w-full sm:w-auto rounded"
           >
-            Conheça Nossas Peças <ArrowRight size={16} />
+            Conheça Nossas Peças <ArrowRight size={16} className="w-4 h-4" />
           </Link>
         </div>
       </section>

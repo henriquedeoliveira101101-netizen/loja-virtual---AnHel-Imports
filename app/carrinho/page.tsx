@@ -35,8 +35,7 @@ export default function PaginaCarrinho() {
   const [saldoCashback, setSaldoCashback] = useState(0)
   const [usarCashback, setUsarCashback] = useState(false)
 
-  // 🚨 NOVO ESTADO: Trava de segurança para dados do cliente
-  const [perfilCompleto, setPerfilCompleto] = useState(true) // Começa como true para não travar antes de carregar
+  const [perfilCompleto, setPerfilCompleto] = useState(true)
 
   // 2. CÁLCULOS GERAIS
   const subtotal = itens.reduce((acc: any, item: any) => acc + (item.preco * item.quantidade), 0)
@@ -71,32 +70,25 @@ export default function PaginaCarrinho() {
           .single()
 
         if (usuarioDb) {
-          // Carrega cashback
           if (usuarioDb.saldo_cashback) {
             setSaldoCashback(Number(usuarioDb.saldo_cashback))
           }
 
-          // 🚨 CORREÇÃO DA VERIFICAÇÃO DE SEGURANÇA: 
-          // Agora ele lê as colunas exatamente com os nomes corretos do banco de dados
           const temDocumento = Boolean(usuarioDb.cpf_cnpj && usuarioDb.whatsapp)
           
           let temEndereco = false
           if (usuarioDb.endereco) {
             try {
-              // Como o endereço é salvo como um JSON, precisamos descompactar para ler
               const endParsed = JSON.parse(usuarioDb.endereco)
               temEndereco = Boolean(endParsed.cep && endParsed.logradouro && endParsed.numero && endParsed.bairro)
             } catch (e) {
-              // Fallback de segurança
               temEndereco = usuarioDb.endereco.length > 10
             }
           }
           
-          // Só libera se tiver documento e endereço válidos
           setPerfilCompleto(temEndereco && temDocumento)
         }
 
-        // Verifica compras anteriores para o bônus de boas vindas
         const { data: pedidos } = await supabase
           .from('pedidos')
           .select('id')
@@ -288,7 +280,6 @@ export default function PaginaCarrinho() {
   const finalizarCompra = async () => {
     if (!session) { router.push('/login'); return; }
 
-    // 🚨 O BLOQUEIO: Se o perfil estiver incompleto, manda ele para Minha Conta
     if (!perfilCompleto) {
       alert("Quase lá! Para podermos enviar suas joias, precisamos do seu Endereço e CPF.\n\nVamos te redirecionar para você preencher os dados.")
       router.push('/minha-conta?aba=dados&alerta=campos_vazios')
@@ -326,9 +317,9 @@ export default function PaginaCarrinho() {
   // 5. RETORNO CONDICIONAL (CARRINHO VAZIO)
   if (itens.length === 0) {
     return (
-      <main className="min-h-[70vh] flex flex-col items-center justify-center bg-hb-black px-6">
-        <h1 className="text-2xl font-light text-white uppercase tracking-widest mb-4 italic">Sua sacola está vazia</h1>
-        <Link href="/" className="text-xs font-bold uppercase tracking-widest border-b border-hb-gold text-hb-gold pb-1 hover:text-hb-goldLight transition">
+      <main className="min-h-[70vh] flex flex-col items-center justify-center bg-hb-black px-4 md:px-6">
+        <h1 className="text-xl md:text-2xl font-light text-white uppercase tracking-widest mb-4 italic text-center">Sua sacola está vazia</h1>
+        <Link href="/" className="text-[10px] md:text-xs font-bold uppercase tracking-widest border-b border-hb-gold text-hb-gold pb-1 hover:text-hb-goldLight transition">
           Explorar Coleções
         </Link>
       </main>
@@ -337,96 +328,100 @@ export default function PaginaCarrinho() {
 
   // 6. RETORNO PRINCIPAL
   return (
-    <main className="min-h-screen bg-hb-black py-16 relative">
-      <div className="max-w-6xl mx-auto px-6">
-        <h1 className="text-2xl font-light text-white uppercase tracking-widest mb-12 text-center italic">Sua Sacola de Luxo</h1>
+    <main className="min-h-screen bg-hb-black py-8 md:py-16 relative">
+      <div className="max-w-6xl mx-auto px-4 md:px-6">
+        <h1 className="text-xl md:text-2xl font-light text-white uppercase tracking-widest mb-8 md:mb-12 text-center italic">Sua Sacola de Luxo</h1>
         
-        <div className="flex flex-col lg:flex-row gap-12">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
           
+          {/* LADO ESQUERDO (ITENS E FRETE) */}
           <div className="flex-1 space-y-6">
-            <div className="bg-hb-gray p-6 rounded-xl border border-gray-800 shadow-sm">
+            <div className="bg-hb-gray p-4 md:p-6 rounded-xl border border-gray-800 shadow-sm">
                 {itens.map((item: any) => (
-                  <div key={item.id} className="flex gap-6 py-6 border-b border-gray-800 last:border-0">
-                    <img src={item.foto} className="w-20 h-20 object-cover rounded border border-gray-700" />
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div className="flex justify-between items-start">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-200">{item.nome}</h3>
-                        <button onClick={() => removerDoCarrinho(item.id)} className="text-gray-500 hover:text-red-500 transition"><Trash2 size={16} /></button>
+                  <div key={item.id} className="flex gap-4 md:gap-6 py-4 md:py-6 border-b border-gray-800 last:border-0">
+                    <img src={item.foto} className="w-20 h-20 md:w-24 md:h-24 object-cover rounded border border-gray-700 shrink-0" />
+                    <div className="flex-1 flex flex-col justify-between gap-3">
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-gray-200 line-clamp-2">{item.nome}</h3>
+                        <button onClick={() => removerDoCarrinho(item.id)} className="text-gray-500 hover:text-red-500 transition shrink-0 p-1 -mt-1 -mr-1"><Trash2 size={16} /></button>
                       </div>
-                      <div className="flex justify-between items-end">
-                        <div className="flex items-center border border-gray-700 rounded overflow-hidden">
-                          <button onClick={() => atualizarQuantidade(item.id, Math.max(1, item.quantidade - 1))} className="px-2 py-1 bg-hb-black text-gray-400 hover:text-white transition text-xs">-</button>
-                          <span className="px-3 py-1 text-xs font-bold text-white">{item.quantidade}</span>
-                          <button onClick={() => atualizarQuantidade(item.id, item.quantidade + 1)} className="px-2 py-1 bg-hb-black text-gray-400 hover:text-white transition text-xs">+</button>
+                      
+                      <div className="flex flex-wrap justify-between items-center gap-3 w-full">
+                        <div className="flex items-center border border-gray-700 rounded overflow-hidden h-8">
+                          <button onClick={() => atualizarQuantidade(item.id, Math.max(1, item.quantidade - 1))} className="px-3 md:px-2 py-1 h-full bg-hb-black text-gray-400 hover:text-white transition text-xs flex items-center justify-center">-</button>
+                          <span className="px-3 py-1 text-xs font-bold text-white flex items-center justify-center h-full border-x border-gray-700">{item.quantidade}</span>
+                          <button onClick={() => atualizarQuantidade(item.id, item.quantidade + 1)} className="px-3 md:px-2 py-1 h-full bg-hb-black text-gray-400 hover:text-white transition text-xs flex items-center justify-center">+</button>
                         </div>
-                        <p className="text-sm font-bold text-hb-gold">R$ {(item.preco * item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-xs md:text-sm font-bold text-hb-gold ml-auto">
+                          R$ {(item.preco * item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
                       </div>
                     </div>
                   </div>
                 ))}
             </div>
 
-            <div className="bg-hb-gray p-6 rounded-xl border border-gray-800 shadow-sm">
-              <div className="flex justify-between items-center mb-6">
+            <div className="bg-hb-gray p-4 md:p-6 rounded-xl border border-gray-800 shadow-sm">
+              <div className="flex justify-between items-center mb-5 md:mb-6">
                 <p className="text-[10px] font-bold text-hb-gold uppercase tracking-widest flex items-center gap-2">
                   <Truck size={16} /> Opções de Entrega
                 </p>
                 {freteGratis && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold text-green-400 bg-green-900/30 border border-green-800 px-2 py-1 rounded">
-                    <CheckCircle2 size={12} /> VOCÊ GANHOU FRETE GRÁTIS
+                  <span className="flex items-center gap-1 text-[8px] md:text-[10px] font-bold text-green-400 bg-green-900/30 border border-green-800 px-2 py-1 rounded">
+                    <CheckCircle2 size={12} /> FRETE GRÁTIS
                   </span>
                 )}
               </div>
 
               {!freteGratis ? (
                 <>
-                  <form onSubmit={calcularFrete} className="flex gap-2 mb-6">
+                  <form onSubmit={calcularFrete} className="flex gap-2 mb-5 md:mb-6">
                     <input
                       type="text"
                       value={cep}
                       onChange={handleCepChange}
                       maxLength={9}
                       placeholder="00000-000"
-                      className="flex-1 px-4 py-3 text-sm bg-hb-black text-white border border-gray-700 rounded outline-none focus:border-hb-gold transition placeholder-gray-600"
+                      className="flex-1 px-3 py-3 md:px-4 text-xs md:text-sm bg-hb-black text-white border border-gray-700 rounded outline-none focus:border-hb-gold transition placeholder-gray-600 min-w-0"
                       required
                     />
                     <button 
                       type="submit" 
                       disabled={carregandoFrete || cep.length < 9}
-                      className="bg-hb-gold text-hb-black px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-hb-goldLight transition disabled:opacity-50 flex items-center gap-2"
+                      className="bg-hb-gold text-hb-black px-4 md:px-6 py-3 text-[9px] md:text-[10px] font-bold uppercase tracking-widest hover:bg-hb-goldLight transition disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 rounded"
                     >
                       {carregandoFrete ? <Loader2 size={14} className="animate-spin" /> : 'Calcular'}
                     </button>
                   </form>
 
-                  {erroFrete && <p className="text-red-500 text-xs mt-2 font-medium mb-4">{erroFrete}</p>}
+                  {erroFrete && <p className="text-red-500 text-[10px] md:text-xs mt-2 font-medium mb-4">{erroFrete}</p>}
 
                   {opcoesFrete.length > 0 && (
                     <div className="space-y-3">
                       {opcoesFrete.map((opcao, index) => (
                         <label 
                           key={index} 
-                          className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-all ${
+                          className={`flex items-center justify-between p-3 md:p-4 rounded-lg border cursor-pointer transition-all ${
                             freteSelecionado === Number(opcao.preco) ? 'border-hb-gold bg-hb-black' : 'border-gray-700 hover:border-hb-gold'
                           }`}
                         >
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3 md:gap-4">
                             <input 
                               type="radio" 
                               name="frete" 
                               value={opcao.preco} 
                               checked={freteSelecionado === Number(opcao.preco)}
                               onChange={() => setFreteSelecionado(Number(opcao.preco))}
-                              className="w-4 h-4 text-hb-gold focus:ring-hb-gold accent-hb-gold cursor-pointer"
+                              className="w-4 h-4 text-hb-gold focus:ring-hb-gold accent-hb-gold cursor-pointer shrink-0"
                             />
                             <div>
-                              <p className="text-xs font-bold text-white uppercase">{opcao.nome}</p>
-                              <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">
-                                Prazo: Até {opcao.prazo} dias úteis
+                              <p className="text-[10px] md:text-xs font-bold text-white uppercase">{opcao.nome}</p>
+                              <p className="text-[9px] md:text-[10px] text-gray-400 uppercase tracking-widest mt-1">
+                                Até {opcao.prazo} dias
                               </p>
                             </div>
                           </div>
-                          <p className="text-sm font-black text-hb-gold">
+                          <p className="text-xs md:text-sm font-black text-hb-gold shrink-0">
                             R$ {Number(opcao.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                         </label>
@@ -435,25 +430,26 @@ export default function PaginaCarrinho() {
                   )}
                 </>
               ) : (
-                <p className="text-sm text-gray-400 italic">O frete é por nossa conta nesta compra! Sua joia será enviada com segurança.</p>
+                <p className="text-xs md:text-sm text-gray-400 italic">O frete é por nossa conta nesta compra! Sua joia será enviada com segurança.</p>
               )}
             </div>
           </div>
 
-          <div className="w-full lg:w-96 space-y-4 flex-shrink-0">
+          {/* LADO DIREITO (RESUMO E EXTRAS) */}
+          <div className="w-full lg:w-96 space-y-4 lg:space-y-6 flex-shrink-0">
             {saldoCashback > 0 && (
-              <div className="bg-gradient-to-r from-hb-gray to-hb-black border border-hb-gold/30 text-white p-5 rounded-xl shadow-sm flex items-center justify-between mb-4 animate-in fade-in duration-500">
-                <div className="flex items-center gap-4">
-                  <div className="bg-hb-gold/20 p-2.5 rounded-full text-hb-gold">
-                    <DollarSign size={18} />
+              <div className="bg-gradient-to-r from-hb-gray to-hb-black border border-hb-gold/30 text-white p-4 md:p-5 rounded-xl shadow-sm flex items-center justify-between animate-in fade-in duration-500">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="bg-hb-gold/20 p-2 md:p-2.5 rounded-full text-hb-gold shrink-0">
+                    <DollarSign size={16} className="md:w-[18px] md:h-[18px]" />
                   </div>
                   <div>
-                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-hb-gold">Créditos HB</h3>
-                    <p className="text-sm font-black text-white mt-0.5">Saldo: R$ {saldoCashback.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <h3 className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-hb-gold">Créditos HB</h3>
+                    <p className="text-xs md:text-sm font-black text-white mt-0.5">R$ {saldoCashback.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
                 
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input 
                     type="checkbox" 
                     className="sr-only peer" 
@@ -466,50 +462,50 @@ export default function PaginaCarrinho() {
             )}
 
             {elegivelBoasVindas && !cupom && (
-              <div className="bg-green-900/20 p-5 rounded-xl border border-green-800 shadow-sm animate-in fade-in duration-500">
-                <h3 className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-1 flex items-center gap-2">
+              <div className="bg-green-900/20 p-4 md:p-5 rounded-xl border border-green-800 shadow-sm animate-in fade-in duration-500">
+                <h3 className="text-[9px] md:text-[10px] font-bold text-green-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                   <Gift size={14} /> Presente de Boas-Vindas
                 </h3>
-                <p className="text-xs text-green-100 mb-4 leading-relaxed">
+                <p className="text-[10px] md:text-xs text-green-100 mb-4 leading-relaxed">
                   Como sua conta é nova, você tem <strong className="font-black text-green-400">10% OFF</strong> na sua primeira compra!
                 </p>
                 <button 
                   onClick={() => { setInputCupom('BEMVINDO10'); validarCupom(); }} 
-                  className="bg-transparent border border-green-500 text-green-400 text-[10px] font-bold uppercase tracking-widest py-3 px-4 rounded hover:bg-green-800 transition w-full"
+                  className="bg-transparent border border-green-500 text-green-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest py-3 px-4 rounded hover:bg-green-800 transition w-full"
                 >
-                  Ativar Cupom BEMVINDO10
+                  Ativar BEMVINDO10
                 </button>
               </div>
             )}
 
             {produtoBump && (
               <div className="bg-gradient-to-r from-hb-gold to-hb-goldDark p-[1px] rounded-xl shadow-md animate-in fade-in duration-500">
-                <div className="bg-hb-gray p-5 rounded-[10px]">
+                <div className="bg-hb-gray p-4 md:p-5 rounded-[10px]">
                   <div className="flex items-center gap-2 mb-4">
-                    <Sparkles size={16} className="text-hb-gold" />
-                    <p className="text-[10px] font-bold text-hb-gold uppercase tracking-widest">
+                    <Sparkles size={14} className="text-hb-gold md:w-4 md:h-4" />
+                    <p className="text-[9px] md:text-[10px] font-bold text-hb-gold uppercase tracking-widest">
                       Complete o Look (Oferta Especial)
                     </p>
                   </div>
                   
-                  <div className="flex gap-4 items-center">
+                  <div className="flex gap-3 md:gap-4 items-center">
                     <img 
                       src={produtoBump.foto} 
                       alt={produtoBump.nome} 
-                      className="w-20 h-20 object-cover rounded-lg border border-gray-700" 
+                      className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg border border-gray-700 shrink-0" 
                     />
                     <div>
-                      <h4 className="text-xs font-bold text-white uppercase leading-tight mb-1 line-clamp-2">
+                      <h4 className="text-[10px] md:text-xs font-bold text-white uppercase leading-tight mb-1 line-clamp-2">
                         {produtoBump.nome}
                       </h4>
-                      <p className="text-[10px] text-gray-500 line-through">De: R$ {produtoBump.preco_original.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                      <p className="text-sm font-black text-hb-gold">Por: R$ {produtoBump.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-[9px] md:text-[10px] text-gray-500 line-through">De: R$ {produtoBump.preco_original.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-xs md:text-sm font-black text-hb-gold">Por: R$ {produtoBump.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                   </div>
 
                   <button 
                     onClick={() => adicionarAoCarrinho(produtoBump)}
-                    className="w-full mt-4 bg-hb-black text-white border border-gray-700 py-3 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-hb-gold hover:text-hb-black transition flex items-center justify-center gap-2"
+                    className="w-full mt-4 bg-hb-black text-white border border-gray-700 py-3 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest hover:bg-hb-gold hover:text-hb-black transition flex items-center justify-center gap-2"
                   >
                     <Plus size={14} /> Adicionar à Sacola
                   </button>
@@ -517,15 +513,15 @@ export default function PaginaCarrinho() {
               </div>
             )}
 
-            <div className="bg-hb-gray p-6 rounded-xl border border-gray-800 shadow-sm">
-              <p className="text-[10px] font-bold text-hb-gold uppercase tracking-widest mb-4">Cupom de Desconto</p>
+            <div className="bg-hb-gray p-4 md:p-6 rounded-xl border border-gray-800 shadow-sm">
+              <p className="text-[9px] md:text-[10px] font-bold text-hb-gold uppercase tracking-widest mb-3 md:mb-4">Cupom de Desconto</p>
               {cupom ? (
                 <div className="flex items-center justify-between bg-green-900/30 p-3 rounded border border-green-800">
                   <div className="flex items-center gap-2 text-green-400">
-                    <Ticket size={16} />
-                    <span className="text-xs font-bold uppercase">{cupom.codigo} (-{cupom.desconto}%)</span>
+                    <Ticket size={14} className="md:w-4 md:h-4" />
+                    <span className="text-[10px] md:text-xs font-bold uppercase">{cupom.codigo} (-{cupom.desconto}%)</span>
                   </div>
-                  <button onClick={removerCupom} className="text-green-400 hover:text-red-500"><X size={16} /></button>
+                  <button onClick={removerCupom} className="text-green-400 hover:text-red-500 p-1"><X size={14} /></button>
                 </div>
               ) : (
                 <div className="flex gap-2">
@@ -534,28 +530,27 @@ export default function PaginaCarrinho() {
                     value={inputCupom}
                     onChange={(e) => setInputCupom(e.target.value)}
                     placeholder="CÓDIGO" 
-                    className="flex-1 bg-hb-black border border-gray-700 p-3 rounded text-xs text-white uppercase outline-none focus:border-hb-gold placeholder-gray-600" 
+                    className="flex-1 bg-hb-black border border-gray-700 p-3 rounded text-[10px] md:text-xs text-white uppercase outline-none focus:border-hb-gold placeholder-gray-600 min-w-0" 
                   />
-                  <button onClick={validarCupom} disabled={validandoCupom} className="bg-hb-gold text-hb-black px-4 rounded text-[10px] font-bold uppercase disabled:opacity-50 flex justify-center items-center hover:bg-hb-goldLight transition">
+                  <button onClick={validarCupom} disabled={validandoCupom} className="bg-hb-gold text-hb-black px-3 md:px-4 py-3 rounded text-[9px] md:text-[10px] font-bold uppercase disabled:opacity-50 flex justify-center items-center hover:bg-hb-goldLight transition shrink-0 min-w-[70px]">
                     {validandoCupom ? <Loader2 size={14} className="animate-spin" /> : 'Aplicar'}
                   </button>
                 </div>
               )}
             </div>
 
-            <div className={`border rounded-xl p-5 flex items-center justify-between gap-4 transition-all duration-300 ${embalagemPresente ? 'bg-hb-black border-hb-gold shadow-[0_0_15px_rgba(212,175,55,0.15)]' : 'bg-hb-gray border-gray-800 shadow-sm'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${embalagemPresente ? 'bg-hb-gold' : 'bg-hb-black border border-gray-700'}`}>
-                  <Gift size={16} className={embalagemPresente ? 'text-hb-black' : 'text-gray-500'} />
+            <div className={`border rounded-xl p-4 md:p-5 flex items-center justify-between gap-3 md:gap-4 transition-all duration-300 ${embalagemPresente ? 'bg-hb-black border-hb-gold shadow-[0_0_15px_rgba(212,175,55,0.15)]' : 'bg-hb-gray border-gray-800 shadow-sm'}`}>
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${embalagemPresente ? 'bg-hb-gold' : 'bg-hb-black border border-gray-700'}`}>
+                  <Gift size={14} className={embalagemPresente ? 'text-hb-black' : 'text-gray-500 md:w-4 md:h-4'} />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-white uppercase tracking-widest">Embalagem de Presente</h3>
-                  <p className="text-[10px] text-gray-400 mt-1 uppercase">Caixa Veludo + Laço</p>
+                  <h3 className="text-[10px] md:text-xs font-bold text-white uppercase tracking-widest">Presente</h3>
+                  <p className="text-[8px] md:text-[10px] text-gray-400 mt-1 uppercase">Caixa Veludo + Laço</p>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <span className="text-xs font-black text-hb-gold">+ R$ 15</span>
-                
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <span className="text-[10px] md:text-xs font-black text-hb-gold">+ R$ 15</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input 
                     type="checkbox" 
@@ -563,14 +558,14 @@ export default function PaginaCarrinho() {
                     checked={embalagemPresente} 
                     onChange={() => setEmbalagemPresente(!embalagemPresente)} 
                   />
-                  <div className="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-hb-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-hb-gold"></div>
+                  <div className="w-8 h-4 md:w-9 md:h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-hb-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 md:after:h-4 md:after:w-4 after:transition-all peer-checked:bg-hb-gold"></div>
                 </label>
               </div>
             </div>
 
-            <div className="bg-hb-gray p-6 rounded-xl border border-gray-800 shadow-sm sticky top-24">
-              <h2 className="text-xs font-bold text-white uppercase tracking-widest mb-6">Resumo do Pedido</h2>
-              <div className="space-y-4 text-xs font-medium text-gray-400 mb-6 border-b border-gray-700 pb-6">
+            <div className="bg-hb-gray p-4 md:p-6 rounded-xl border border-gray-800 shadow-sm lg:sticky lg:top-24">
+              <h2 className="text-[10px] md:text-xs font-bold text-white uppercase tracking-widest mb-4 md:mb-6">Resumo do Pedido</h2>
+              <div className="space-y-3 md:space-y-4 text-[10px] md:text-xs font-medium text-gray-400 mb-5 md:mb-6 border-b border-gray-700 pb-5 md:pb-6">
                 <div className="flex justify-between"><span>Subtotal</span><span className="text-white">R$ {subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></div>
                 
                 <div className="flex justify-between">
@@ -601,19 +596,22 @@ export default function PaginaCarrinho() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-between items-center mb-8">
-                <span className="font-bold text-white text-sm uppercase">Total</span>
-                <span className="text-xl font-bold text-hb-gold">R$ {totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+              
+              <div className="flex justify-between items-center mb-6 md:mb-8">
+                <span className="font-bold text-white text-xs md:text-sm uppercase">Total</span>
+                <span className="text-lg md:text-xl font-bold text-hb-gold">R$ {totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
               </div>
+              
               <button 
                 onClick={finalizarCompra} 
                 disabled={carregando || (freteFinal === 0 && !freteGratis)} 
-                className="w-full bg-hb-gold text-hb-black py-4 font-bold text-xs uppercase tracking-widest hover:bg-hb-goldLight transition flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full bg-hb-gold text-hb-black py-3 md:py-4 rounded font-bold text-[10px] md:text-xs uppercase tracking-widest hover:bg-hb-goldLight transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {carregando ? <Loader2 className="animate-spin" size={18} /> : 'Finalizar Compra'}
+                {carregando ? <Loader2 className="animate-spin" size={16} /> : 'Finalizar Compra'}
               </button>
+              
               {freteFinal === 0 && !freteGratis && (
-                <p className="text-[9px] text-red-400 font-bold uppercase tracking-widest mt-3 text-center">Calcule o frete para continuar</p>
+                <p className="text-[8px] md:text-[9px] text-red-400 font-bold uppercase tracking-widest mt-3 text-center">Calcule o frete para continuar</p>
               )}
             </div>
           </div>
@@ -622,27 +620,27 @@ export default function PaginaCarrinho() {
 
       {mostrarPopUpSaida && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-          <div className="bg-hb-gray border border-gray-700 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-500">
-            <button onClick={() => setMostrarPopUpSaida(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white z-10 bg-hb-black/50 rounded-full p-1 transition"><X size={20} /></button>
-            <div className="h-40 bg-black relative flex items-center justify-center overflow-hidden border-b border-hb-gold/30">
+          <div className="bg-hb-gray border border-gray-700 rounded-2xl max-w-lg w-[95%] md:w-full overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-500">
+            <button onClick={() => setMostrarPopUpSaida(false)} className="absolute top-3 md:top-4 right-3 md:right-4 text-gray-400 hover:text-white z-10 bg-hb-black/50 rounded-full p-1 md:p-1.5 transition"><X size={18} /></button>
+            <div className="h-32 md:h-40 bg-black relative flex items-center justify-center overflow-hidden border-b border-hb-gold/30">
               <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=800')] bg-cover bg-center opacity-30"></div>
               <div className="relative z-10 flex flex-col items-center">
-                <AlertCircle size={40} className="text-hb-gold mb-2 animate-bounce" />
-                <h2 className="text-2xl font-light text-white uppercase tracking-widest">Espere!</h2>
+                <AlertCircle size={32} className="text-hb-gold mb-2 animate-bounce md:w-10 md:h-10" />
+                <h2 className="text-xl md:text-2xl font-light text-white uppercase tracking-widest">Espere!</h2>
               </div>
             </div>
-            <div className="p-8 text-center">
-              <h3 className="text-lg font-bold text-hb-gold uppercase tracking-widest mb-3">Não vá embora de mãos vazias</h3>
-              <p className="text-sm text-gray-300 leading-relaxed mb-6">
+            <div className="p-5 md:p-8 text-center">
+              <h3 className="text-sm md:text-lg font-bold text-hb-gold uppercase tracking-widest mb-2 md:mb-3">Não vá embora de mãos vazias</h3>
+              <p className="text-[11px] md:text-sm text-gray-300 leading-relaxed mb-5 md:mb-6">
                 Notamos que você ia sair, mas não queremos que você perca essas peças exclusivas. Finalize sua compra agora e ganhe <strong className="text-white">{novoDescontoRetencao}% DE DESCONTO</strong> no carrinho todo.
               </p>
-              <div className="bg-hb-black border border-hb-gold border-dashed rounded-lg p-4 mb-6">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Seu Cupom Exclusivo</p>
-                <p className="text-xl font-black text-hb-gold tracking-[0.2em]">{codigoRetencao}</p>
+              <div className="bg-hb-black border border-hb-gold border-dashed rounded-lg p-3 md:p-4 mb-5 md:mb-6">
+                <p className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Seu Cupom Exclusivo</p>
+                <p className="text-lg md:text-xl font-black text-hb-gold tracking-[0.2em]">{codigoRetencao}</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button onClick={aplicarDescontoRetencao} className="flex-1 bg-hb-gold text-hb-black py-4 rounded text-xs font-bold uppercase tracking-widest hover:bg-hb-goldLight transition shadow-lg">Aplicar {novoDescontoRetencao}% Off Agora</button>
-                <button onClick={() => setMostrarPopUpSaida(false)} className="flex-1 bg-hb-black border border-gray-700 text-gray-300 py-4 rounded text-xs font-bold uppercase tracking-widest hover:bg-gray-800 hover:text-white transition">Talvez Depois</button>
+              <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+                <button onClick={aplicarDescontoRetencao} className="flex-1 bg-hb-gold text-hb-black py-3 md:py-4 rounded text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-hb-goldLight transition shadow-lg">Aplicar {novoDescontoRetencao}% Off</button>
+                <button onClick={() => setMostrarPopUpSaida(false)} className="flex-1 bg-hb-black border border-gray-700 text-gray-300 py-3 md:py-4 rounded text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-gray-800 hover:text-white transition">Talvez Depois</button>
               </div>
             </div>
           </div>

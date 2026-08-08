@@ -2,6 +2,7 @@
 
 import { useCart } from '@/lib/store'
 import { useState } from 'react'
+import { ShoppingBag, Check } from 'lucide-react'
 
 export default function BotaoAdicionar({ produto }: { produto: any }) {
   const adicionarAoCarrinho = useCart((state) => state.adicionarAoCarrinho)
@@ -24,13 +25,21 @@ export default function BotaoAdicionar({ produto }: { produto: any }) {
     <button 
       onClick={handleAdicionar}
       disabled={adicionado}
-      className={`w-full font-bold py-4 rounded transition-all duration-300 uppercase tracking-widest ${
+      className={`w-full font-bold text-[11px] md:text-sm py-3 md:py-4 rounded shadow-lg transition-all duration-300 uppercase tracking-widest flex items-center justify-center gap-2 ${
         adicionado 
-          ? 'bg-green-600 hover:bg-green-700 text-white' 
-          : 'bg-hb-gold text-hb-black hover:bg-hb-goldLight'
+          ? 'bg-green-600 hover:bg-green-700 text-white shadow-green-900/20' 
+          : 'bg-hb-gold text-hb-black hover:bg-hb-goldLight shadow-hb-gold/10'
       }`}
     >
-      {adicionado ? 'Adicionado à Sacola!' : 'Adicionar à Sacola'}
+      {adicionado ? (
+        <>
+          <Check size={16} /> Adicionado à Sacola
+        </>
+      ) : (
+        <>
+          <ShoppingBag size={16} /> Adicionar à Sacola
+        </>
+      )}
     </button>
   )
 }
