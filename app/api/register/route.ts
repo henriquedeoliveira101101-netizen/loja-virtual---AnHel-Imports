@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
 import { Resend } from 'resend'
 
-// 1. Chave com fallback para não travar o build na Vercel
+// Usa a chave do Resend ou uma string padrão para o build na Vercel não falhar
 const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder_for_build')
 
 export async function POST(request: Request) {
@@ -16,26 +16,26 @@ export async function POST(request: Request) {
 
     const emailFormatado = email.toLowerCase().trim()
 
-    // 2. Verifica se o cliente já tem conta com este e-mail
+    // 1. Verifica se o cliente já tem conta com este e-mail
     const { data: usuarioExistente } = await supabase
       .from('usuarios')
       .select('*')
       .eq('email', emailFormatado)
       .single()
 
-    // 3. Criptografa a nova senha
+    // 2. Criptografa a senha
     const salt = await bcrypt.genSalt(10)
     const senhaCriptografada = await bcrypt.hash(senha, salt)
 
-    // 4. Geração do novo código de verificação
+    // 3. Gera o código de verificação de 6 dígitos
     const codigoVerificacao = Math.floor(100000 + Math.random() * 900000).toString()
 
     if (usuarioExistente) {
-      // Se o usuário existe e JÁ ESTÁ VERIFICADO, bloqueia.
+      // Se o usuário já existe e ESTÁ VERIFICADO, bloqueia
       if (usuarioExistente.email_verificado) {
         return NextResponse.json({ error: 'Este e-mail já está cadastrado e verificado. Faça login.' }, { status: 400 })
       } else {
-        // Se existe mas NÃO ESTÁ VERIFICADO, atualiza o código e a senha para ele tentar de novo
+        // Se existe mas NÃO ESTÁ VERIFICADO, atualiza o código e a nova senha para ele tentar de novo
         const { error: erroUpdate } = await supabase
           .from('usuarios')
           .update({
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         if (erroUpdate) throw erroUpdate
       }
     } else {
-      // 5. Se não existe, cria um novo usuário do zero
+      // 4. Cria o usuário do zero caso ainda não exista
       const { error: erroInsert } = await supabase
         .from('usuarios')
         .insert([
@@ -64,10 +64,10 @@ export async function POST(request: Request) {
       if (erroInsert) throw erroInsert
     }
 
-    // 6. ENVIO DO E-MAIL VIA RESEND
+    // 5. Envia o e-mail com o código de verificação via Resend
     try {
       const { data, error: resendError } = await resend.emails.send({
-        from: 'HB Importados <onboarding@resend.dev>', // REMETENTE DE TESTE DO RESEND
+        from: 'HB Importados <onboarding@resend.dev>', // Remetente de testes do Resend
         to: [emailFormatado],
         subject: `${codigoVerificacao} é o seu código de verificação HB`,
         html: `

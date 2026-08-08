@@ -27,20 +27,23 @@ export default function PaginaCadastro() {
     setCarregando(true)
 
     try {
-      const res = await fetch('/api/auth/register', {
+      // ✅ Chama a nova rota para não conflitar com NextAuth
+      const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nome, email, senha })
       })
 
-      if (res.ok) {
-        router.push('/login?sucesso=true')
+      const data = await res.json().catch(() => null)
+
+      if (res.ok && data?.sucesso) {
+        // Redireciona para a tela de digitar o código enviado por e-mail
+        router.push(`/verificar?email=${encodeURIComponent(email.toLowerCase().trim())}`)
       } else {
-        const data = await res.json()
-        alert(data.error || "Erro ao criar conta.")
+        alert(data?.error || "Erro ao criar conta. Tente novamente.")
       }
     } catch (error) {
-      alert("Erro de conexão.")
+      alert("Erro de conexão ao tentar contatar o servidor.")
     } finally {
       setCarregando(false)
     }
