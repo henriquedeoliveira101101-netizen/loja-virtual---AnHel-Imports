@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase' // Usa o cliente tratado
 import bcrypt from 'bcryptjs'
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
-const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder_for_build')
+// Configuração do Gmail (Substituindo o Resend)
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+})
 
 export async function POST(request: Request) {
   try {
@@ -66,23 +73,28 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Envio de e-mail (Isolado para NUNCA travar o cadastro do usuário)
-    if (process.env.RESEND_API_KEY) {
+    // 4. Envio de e-mail via Gmail (Garante envio gratuito para QUALQUER e-mail)
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       try {
-        await resend.emails.send({
-          from: 'HB Importados <onboarding@resend.dev>',
-          to: [emailFormatado],
-          subject: `${codigoVerificacao} é o seu código HB`,
+        await transporter.sendMail({
+          from: `"HB Importados" <${process.env.EMAIL_USER}>`,
+          to: emailFormatado, 
+          subject: `${codigoVerificacao} é o seu código de verificação HB`,
           html: `
             <div style="font-family: sans-serif; text-align: center; padding: 20px;">
               <h2>Seu código de verificação HB</h2>
-              <h1 style="letter-spacing: 5px;">${codigoVerificacao}</h1>
+              <p>Olá ${nome}, use o código abaixo para ativar sua conta e acessar nossas coleções:</p>
+              <h1 style="letter-spacing: 5px; font-size: 32px; background: #f9f9f9; border: 1px dashed #ccc; padding: 15px; border-radius: 10px; display: inline-block; margin-top: 20px;">
+                ${codigoVerificacao}
+              </h1>
             </div>
           `
         })
       } catch (e) {
-        console.error("Erro ao enviar e-mail via Resend (Cadastro mantido):", e)
+        console.error("Erro ao enviar e-mail via Gmail (Cadastro mantido):", e)
       }
+    } else {
+      console.warn("Aviso: Variáveis EMAIL_USER e EMAIL_PASS não encontradas na Vercel.")
     }
 
     return NextResponse.json({ sucesso: true })
