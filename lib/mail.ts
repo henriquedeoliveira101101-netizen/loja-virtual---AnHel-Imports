@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
-// Inicializa o Resend com a chave que colocamos no .env.local
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Adicionamos um fallback para o build da Vercel não quebrar se a chave não estiver presente na compilação
+const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder_for_build');
 
 export async function enviarEmailStatus(email: string, nome: string, status: string, dadoExtra?: string) {
   let assunto = "";
@@ -38,16 +38,16 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
         </div>
         
         <div style="text-align: center;">
-          <a href="https://hbimportados.com.br/minha-conta" style="background: #000; color: #fff; padding: 16px 32px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Acompanhar Linha do Tempo</a>
+          <a href="https://loja-virtual-an-hel-imports.vercel.app/minha-conta" style="background: #000; color: #fff; padding: 16px 32px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Acompanhar Linha do Tempo</a>
         </div>
       </div>
     `;
   }
 
-  // ⭐ NOVO: E-mail de Recuperação de Senha
+  // ⭐ E-mail de Recuperação de Senha
   if (status === 'recuperacao') {
     assunto = "Recuperação de Senha - HB Importados";
-    const linkRecuperacao = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/redefinir-senha?token=${dadoExtra}`;
+    const linkRecuperacao = `${process.env.NEXTAUTH_URL || 'https://loja-virtual-an-hel-imports.vercel.app'}/redefinir-senha?token=${dadoExtra}`;
     
     html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
@@ -68,14 +68,14 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
   }
 
   // Tenta enviar o e-mail (com proteção contra erros)
-try {
+  try {
     const data = await resend.emails.send({
-  from: 'HB Importados <onboarding@resend.dev>', // Use este remetente para testes
-  to: email,
-  subject: assunto,
-  html: html,
-});
-    console.log("RESPOSTA DO RESEND:", data); // Adicione esta linha para vermos o log!
+      from: 'HB Importados <onboarding@resend.dev>', // Use este remetente para testes
+      to: email,
+      subject: assunto,
+      html: html,
+    });
+    console.log("RESPOSTA DO RESEND:", data);
     return { sucesso: true, data };
   } catch (error) {
     console.error("Erro ao enviar e-mail:", error);

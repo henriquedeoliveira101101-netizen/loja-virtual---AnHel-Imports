@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { enviarEmailStatus } from '@/lib/mail'
 import crypto from 'crypto'
 
 export async function POST(request: Request) {
@@ -40,8 +39,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Erro ao salvar dados' }, { status: 500 })
     }
 
-    // 3. Tenta enviar o e-mail
+    // 3. Importa o e-mail dinamicamente para evitar erro de inicialização no build
     console.log("Disparando e-mail via Resend...")
+    const { enviarEmailStatus } = await import('@/lib/mail')
     const emailRes = await enviarEmailStatus(usuario.email, usuario.nome, 'recuperacao', token)
     
     if (!emailRes.sucesso) {
