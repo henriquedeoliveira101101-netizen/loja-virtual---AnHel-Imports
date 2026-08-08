@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase' // Usa o cliente tratado
 import bcrypt from 'bcryptjs'
 import { Resend } from 'resend'
 
