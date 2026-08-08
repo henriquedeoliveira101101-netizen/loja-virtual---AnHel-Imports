@@ -77,16 +77,40 @@ export async function POST(request: Request) {
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       try {
         await transporter.sendMail({
-          from: `"HB Importados" <${process.env.EMAIL_USER}>`,
-          to: emailFormatado, 
-          subject: `${codigoVerificacao} é o seu código de verificação HB`,
+          from: `"AnHel Imports" <${process.env.EMAIL_USER}>`, // Nome atualizado!
+          to: emailFormatado,
+          subject: `Seu código de acesso: ${codigoVerificacao}`, // Assunto mais limpo
+          // Versão em texto puro (Essencial para fugir do Spam)
+          text: `Olá ${nome}. Seu código de verificação da AnHel Imports é: ${codigoVerificacao}`,
+          // Nova versão HTML (Design elegante, escuro e dourado)
           html: `
-            <div style="font-family: sans-serif; text-align: center; padding: 20px;">
-              <h2>Seu código de verificação HB</h2>
-              <p>Olá ${nome}, use o código abaixo para ativar sua conta e acessar nossas coleções:</p>
-              <h1 style="letter-spacing: 5px; font-size: 32px; background: #f9f9f9; border: 1px dashed #ccc; padding: 15px; border-radius: 10px; display: inline-block; margin-top: 20px;">
-                ${codigoVerificacao}
-              </h1>
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #111111; color: #ffffff; padding: 40px 20px; border-radius: 8px; text-align: center;">
+              
+              <h2 style="color: #D4AF37; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; font-weight: 300;">
+                AnHel Imports
+              </h2>
+              
+              <p style="font-size: 16px; color: #cccccc; line-height: 1.6; margin-bottom: 10px;">
+                Olá, <strong>${nome}</strong>.
+              </p>
+              
+              <p style="font-size: 16px; color: #cccccc; margin-bottom: 40px;">
+                Use o código de segurança abaixo para validar sua conta e acessar nossas coleções exclusivas.
+              </p>
+              
+              <div style="background-color: #000000; border: 1px solid #D4AF37; padding: 20px 40px; border-radius: 4px; display: inline-block; margin-bottom: 40px;">
+                <h1 style="color: #D4AF37; font-size: 42px; letter-spacing: 12px; margin: 0; font-weight: 400;">
+                  ${codigoVerificacao}
+                </h1>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #333333; margin-bottom: 20px;" />
+              
+              <p style="font-size: 12px; color: #666666; line-height: 1.5;">
+                Se você não solicitou este código, por favor, ignore este e-mail. <br/>
+                © 2026 AnHel Imports. Todos os direitos reservados.
+              </p>
+              
             </div>
           `
         })
