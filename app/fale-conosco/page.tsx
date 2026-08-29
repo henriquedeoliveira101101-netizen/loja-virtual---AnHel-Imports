@@ -17,14 +17,14 @@ export default function FaleConosco() {
                 <Mail className="text-hb-gold mt-1" size={20} />
                 <div>
                   <p className="font-bold text-gray-200 uppercase tracking-widest text-xs mb-1">E-mail</p>
-                  <p>contato@hbimportados.com.br</p>
+                  <p>anhelimports@gmail.com</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <Phone className="text-hb-gold mt-1" size={20} />
                 <div>
                   <p className="font-bold text-gray-200 uppercase tracking-widest text-xs mb-1">WhatsApp</p>
-                  <p>(47) 99999-9999 <br/><span className="text-xs text-gray-500">Seg a Sex das 09h às 18h</span></p>
+                  <p>(47) 99738-6824 <br/><span className="text-xs text-gray-500">Seg a Sex das 09h às 18h</span></p>
                 </div>
               </div>
               <div className="flex items-start gap-4">

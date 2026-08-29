@@ -58,7 +58,7 @@ export default function PaginaCadastro() {
             Criar Conta
           </h1>
           <p className="text-[10px] md:text-xs text-gray-600 uppercase tracking-widest font-medium">
-            Junte-se à experiência HB Importados
+            Junte-se à experiência AnHel Imports
           </p>
         </div>
 

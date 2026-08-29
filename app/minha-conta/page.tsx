@@ -283,7 +283,7 @@ export default function MinhaConta() {
                 <div className="absolute -right-10 -bottom-10 bg-hb-gold/10 w-32 h-32 md:w-40 md:h-40 rounded-full group-hover:scale-110 transition-transform duration-700"></div>
                 <div className="flex justify-between items-start relative z-10">
                   <div className="space-y-1">
-                    <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-hb-gold flex items-center gap-1"><Sparkles size={10} className="md:w-3 md:h-3" /> Cliente VIP HB</p>
+                    <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-hb-gold flex items-center gap-1"><Sparkles size={10} className="md:w-3 md:h-3" /> Cliente VIP AnHel</p>
                     <h3 className="text-lg md:text-xl font-light tracking-wide text-gray-200">Créditos</h3>
                   </div>
                   <div className="p-2 md:p-3 bg-hb-gold/10 text-hb-gold rounded-full"><DollarSign size={16} className="md:w-5 md:h-5" /></div>

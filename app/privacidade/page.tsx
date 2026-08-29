@@ -41,7 +41,7 @@ export default function PaginaPrivacidade() {
 
           <section>
             <h2 className="text-[11px] md:text-sm font-bold text-hb-gold uppercase tracking-widest mb-3 md:mb-4">5. Seus Direitos</h2>
-            <p>A qualquer momento, você pode solicitar o acesso, correção ou exclusão definitiva dos seus dados de nosso banco de dados através do e-mail contato@hbimportados.com.br.</p>
+            <p>A qualquer momento, você pode solicitar o acesso, correção ou exclusão definitiva dos seus dados de nosso banco de dados através do e-mail anhelimports@gmail.com</p>
           </section>
         </div>
       </div>

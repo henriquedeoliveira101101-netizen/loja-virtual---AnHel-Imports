@@ -444,7 +444,7 @@ export default function PaginaCarrinho() {
                     <DollarSign size={16} className="md:w-[18px] md:h-[18px]" />
                   </div>
                   <div>
-                    <h3 className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-hb-gold">Créditos HB</h3>
+                    <h3 className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-hb-gold">Créditos AnHel</h3>
                     <p className="text-xs md:text-sm font-black text-white mt-0.5">R$ {saldoCashback.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>

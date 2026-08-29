@@ -26,7 +26,7 @@ export default function PaginaTermos() {
 
           <section>
             <h2 className="text-[11px] md:text-sm font-bold text-hb-gold uppercase tracking-widest mb-3 md:mb-4">2. Propriedade Intelectual</h2>
-            <p>Todo o conteúdo incluído neste site, como textos, gráficos, logotipos, ícones, imagens e seleção de produtos, é de propriedade exclusiva da HB Importados e protegido pelas leis de direitos autorais brasileiras e internacionais.</p>
+            <p>Todo o conteúdo incluído neste site, como textos, gráficos, logotipos, ícones, imagens e seleção de produtos, é de propriedade exclusiva da AnHel Imports e protegido pelas leis de direitos autorais brasileiras e internacionais.</p>
           </section>
 
           <section>
@@ -41,7 +41,7 @@ export default function PaginaTermos() {
 
           <section>
             <h2 className="text-[11px] md:text-sm font-bold text-hb-gold uppercase tracking-widest mb-3 md:mb-4">5. Limitação de Responsabilidade</h2>
-            <p>A HB Importados não se responsabiliza por danos decorrentes do uso inadequado das joias (contato com produtos químicos, perfumes ou quedas). As orientações de cuidado enviadas por e-mail devem ser seguidas rigorosamente.</p>
+            <p>A AnHel Imports não se responsabiliza por danos decorrentes do uso inadequado das joias (contato com produtos químicos, perfumes ou quedas). As orientações de cuidado enviadas por e-mail devem ser seguidas rigorosamente.</p>
           </section>
         </div>
       </div>

@@ -8,7 +8,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* MENU LATERAL ESCURO */}
       <aside className="w-64 bg-hb-gray border-r border-gray-800 text-white flex flex-col fixed h-full z-10 shadow-xl">
         <div className="p-6 border-b border-gray-800">
-          <h2 className="text-xl font-bold tracking-widest uppercase text-hb-gold">HB Admin</h2>
+          <h2 className="text-xl font-bold tracking-widest uppercase text-hb-gold">AnHel Admin</h2>
           <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Painel de Controle</p>
         </div>
         

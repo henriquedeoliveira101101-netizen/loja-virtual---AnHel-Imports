@@ -10,7 +10,7 @@ export default function PaginaSobre() {
         <h1 className="text-2xl md:text-4xl lg:text-5xl font-light text-white uppercase tracking-widest italic mb-3 md:mb-4">
           Nossa História
         </h1>
-        <p className="text-hb-gold text-[10px] md:text-sm uppercase tracking-widest">A essência da HB Importados</p>
+        <p className="text-hb-gold text-[10px] md:text-sm uppercase tracking-widest">A essência da AnHel Imports</p>
       </section>
 
       {/* Conteúdo */}
@@ -20,7 +20,7 @@ export default function PaginaSobre() {
         </h2>
         <div className="space-y-5 md:space-y-6 text-gray-400 leading-relaxed font-light text-sm md:text-base text-left md:text-center">
           <p>
-            A <strong className="text-hb-gold font-normal">HB Importados</strong> nasceu da paixão por peças exclusivas e do desejo de trazer para o Brasil o que há de mais sofisticado no mercado mundial de joias. 
+            A <strong className="text-hb-gold font-normal">ANHel Imports</strong> nasceu da paixão por peças exclusivas e do desejo de trazer para o Brasil o que há de mais sofisticado no mercado mundial de joias. 
           </p>
           <p>
             Cada colar, pulseira e brinco que selecionamos passa por um rigoroso controle de qualidade. Trabalhamos apenas com materiais premium, garantindo não apenas o brilho imediato, mas a durabilidade que uma verdadeira joia de luxo exige.

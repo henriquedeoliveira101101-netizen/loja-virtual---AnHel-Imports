@@ -9,7 +9,7 @@ export default function Footer() {
         {/* Coluna 1: Sobre a Marca */}
         <div className="flex flex-col items-center md:items-start">
           <Link href="/" className="text-xl md:text-2xl font-bold tracking-widest text-hb-gold mb-4 md:mb-6 hover:text-hb-goldLight transition-colors">
-            HB IMPORTADOS
+            AnHel Imports
           </Link>
           <p className="text-xs md:text-sm text-gray-500 leading-relaxed mb-6 font-light">
             Especialistas em joias premium e relógios importados. Trazendo o que há de mais exclusivo no mundo da alta joalheria diretamente para você.
@@ -52,11 +52,11 @@ export default function Footer() {
           <div className="flex flex-col gap-3 md:gap-4 text-xs md:text-sm text-gray-500 font-light">
             <div className="flex items-center justify-center md:justify-start gap-3 hover:text-hb-goldLight transition-colors">
               <Mail size={16} className="text-hb-gold" />
-              <span>contato@hbimportados.com.br</span>
+              <span>anhelimports@gmail.com</span>
             </div>
             <div className="flex items-center justify-center md:justify-start gap-3 hover:text-hb-goldLight transition-colors">
               <Phone size={16} className="text-hb-gold" />
-              <span>(47) 99999-9999</span>
+              <span>(47) 99738-6824</span>
             </div>
             <div className="flex items-start justify-center md:justify-start gap-3 mt-1 md:mt-2 hover:text-hb-goldLight transition-colors">
               <MapPin size={16} className="mt-1 flex-shrink-0 text-hb-gold" />
@@ -70,7 +70,7 @@ export default function Footer() {
       {/* COPYRIGHT & SELOS */}
       <div className="max-w-6xl mx-auto px-6 mt-12 md:mt-16 pt-6 md:pt-8 border-t border-hb-gray flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-[10px] md:text-xs text-gray-600 font-medium text-center md:text-left">
-          © {new Date().getFullYear()} HB Importados. Todos os direitos reservados.
+          © {new Date().getFullYear()} AnHel Imports. Todos os direitos reservados.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
           <div className="text-[9px] md:text-[10px] text-gray-500 flex gap-3 md:gap-4 font-bold uppercase tracking-widest">

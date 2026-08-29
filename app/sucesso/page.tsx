@@ -57,7 +57,7 @@ function ConteudoSucesso() {
               Clube VIP <Sparkles size={10} className="text-hb-gold md:w-3 md:h-3" />
             </h3>
             <p className="text-[9px] md:text-[10px] text-gray-400 leading-relaxed">
-              Quando sua joia chegar, poste uma foto nos stories marcando <strong className="text-hb-gold">@hbimportados</strong> e ganhe um cupom de <strong className="text-white">10% OFF</strong> para a próxima compra!
+              Quando sua joia chegar, poste uma foto nos stories marcando <strong className="text-hb-gold">@AnHelImports</strong> e ganhe um cupom de <strong className="text-white">10% OFF</strong> para a próxima compra!
             </p>
           </div>
         </div>

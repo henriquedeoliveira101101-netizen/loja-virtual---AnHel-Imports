@@ -73,7 +73,7 @@ export default async function PaginaProduto({ params }: PageProps) {
 
           {/* LADO DIREITO: DETALHES */}
           <div className="flex flex-col justify-start md:justify-center w-full">
-            <span className="text-[10px] md:text-sm text-gray-500 uppercase tracking-[0.3em] mb-2 font-medium">HB Importados</span>
+            <span className="text-[10px] md:text-sm text-gray-500 uppercase tracking-[0.3em] mb-2 font-medium">AnHel Imports</span>
             
             <div className="flex items-start justify-between gap-4 mb-3 md:mb-4">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-white uppercase tracking-tight leading-none break-words flex-1">
