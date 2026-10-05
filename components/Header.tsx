@@ -80,7 +80,7 @@ export default function Header() {
 
         {/* CENTRO: Logo Absoluta (Garante que nunca sairá do meio) */}
         <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-lg md:text-xl font-bold tracking-widest text-hb-gold whitespace-nowrap">
-          HB IMPORTADOS
+          ANHEL IMPORTS
         </Link>
 
         {/* DIREITA: Ícones (Pesquisa, Usuário e Carrinho) */}
