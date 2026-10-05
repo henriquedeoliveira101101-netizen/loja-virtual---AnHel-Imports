@@ -67,10 +67,14 @@ export async function POST(request: Request) {
           }
 
           // 4. ENVIO DE E-MAIL AUTOMÁTICO (Usando a sua lib centralizada)
-          if (pedido.usuarios?.email) {
+          // Agora funciona para clientes logados e visitantes
+          const emailParaNotificar = pedido.usuarios?.email || pedido.cliente_email
+          const nomeParaNotificar = pedido.usuarios?.nome || pedido.cliente_nome || 'Cliente AnHel'
+
+          if (emailParaNotificar) {
             await enviarEmailStatus(
-              pedido.usuarios.email, 
-              pedido.usuarios.nome, 
+              emailParaNotificar, 
+              nomeParaNotificar, 
               'confirmado'
             )
           }

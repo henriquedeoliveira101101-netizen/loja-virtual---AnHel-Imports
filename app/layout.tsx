@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "HB Importados | Joias Premium",
+  title: "ANHEL IMPORTS | Joias Premium",
   description: "A melhor seleção de joias e importados",
 };
 
