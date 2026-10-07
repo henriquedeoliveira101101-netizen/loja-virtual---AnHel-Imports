@@ -5,6 +5,21 @@ export async function POST(request: Request) {
   try {
     const { pedidoId, produtoId, usuarioId, motivo, fotoUrl, precoProduto } = await request.json()
 
+    // 🚨 NOVA TRAVA: Verifica se já existe uma troca para este produto neste pedido
+    const { data: trocaExistente, error: erroBusca } = await supabase
+      .from('trocas')
+      .select('id')
+      .eq('pedido_id', pedidoId)
+      .eq('produto_id', produtoId)
+      .single()
+
+    if (trocaExistente) {
+      return NextResponse.json(
+        { error: 'Você já abriu uma solicitação de troca/devolução para este item.' }, 
+        { status: 400 }
+      )
+    }
+
     // 1. Verificação de Prevenção a Fraudes (Histórico do Cliente)
     const { count: totalTrocas } = await supabase
       .from('trocas')
@@ -14,7 +29,6 @@ export async function POST(request: Request) {
     const clienteSuspeito = totalTrocas && totalTrocas >= 3
 
     // 2. Regra de Negócio: Aprovação Automática vs Análise Manual
-    // Se o motivo for defeito, o produto custar menos de R$ 50, e o cliente não for suspeito.
     const limiteAutoAprovacao = 50.00
     let statusTroca = 'analise_pendente'
     let cupomGerado = null
@@ -22,14 +36,12 @@ export async function POST(request: Request) {
     if (motivo === 'defeito' && precoProduto <= limiteAutoAprovacao && !clienteSuspeito) {
       statusTroca = 'aprovado_automatico'
       
-      // Gera Cupom com 10% de Bônus para reter o cliente na loja
       const valorComBonus = precoProduto * 1.10
       const codigoCupom = `TROCA-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
       
-      // Salva o cupom no banco de dados
       await supabase.from('cupons').insert([{
         codigo: codigoCupom,
-        desconto: 0, // Usamos valor fixo em vez de porcentagem neste caso
+        desconto: 0,
         valor_fixo: valorComBonus,
         usuario_id: usuarioId,
         ativo: true

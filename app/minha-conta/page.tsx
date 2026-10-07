@@ -48,6 +48,9 @@ export default function MinhaConta() {
 
   const [mostrarErros, setMostrarErros] = useState(false)
 
+  // Novo estado para controlar itens que já tiveram troca solicitada na sessão atual
+  const [itensComTrocaSolicitada, setItensComTrocaSolicitada] = useState<string[]>([])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
@@ -212,18 +215,30 @@ export default function MinhaConta() {
         urlFoto = publicUrlData.publicUrl
       }
 
+      // Adicionamos o ID do produto real aqui
       const response = await fetch('/api/trocas', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pedidoId: pedidoIdSelecionado, produtoId: null, usuarioId: null, motivo, fotoUrl: urlFoto, precoProduto: itemSelecionado.preco || 0 })
+        body: JSON.stringify({ 
+          pedidoId: pedidoIdSelecionado, 
+          produtoId: itemSelecionado.id, // ID real do produto
+          usuarioId: session?.user?.id || null, // ID do usuário logado se existir
+          motivo, 
+          fotoUrl: urlFoto, 
+          precoProduto: itemSelecionado.preco || 0 
+        })
       })
 
       const data = await response.json()
       if (!response.ok) throw new Error(data.error)
 
       setMensagemSucesso(data.mensagem)
+      
+      // Adiciona o item à lista de itens com troca solicitada
+      setItensComTrocaSolicitada(prev => [...prev, `${pedidoIdSelecionado}-${itemSelecionado.id}`])
+
       setTimeout(() => { setModalAberta(false); setMensagemSucesso(''); }, 5000)
     } catch (err: any) {
-      setErroTroca('Ocorreu um erro ao processar sua solicitação.')
+      setErroTroca(err.message || 'Ocorreu um erro ao processar sua solicitação.')
     } finally {
       setCarregandoTroca(false)
     }
@@ -590,15 +605,27 @@ export default function MinhaConta() {
                       </div>
                       <div className="p-4 md:p-5">
                         <div className="space-y-4">
-                          {pedido.itens?.map((item: any, idx: number) => (
-                            <div key={`troca-item-${idx}`} className="flex items-center gap-3 md:gap-4 border-b border-gray-800 pb-4 last:border-0 last:pb-0">
-                              <img src={item.foto} className="w-10 h-10 md:w-12 md:h-12 object-cover rounded border border-gray-800 shrink-0" />
-                              <div className="flex-1 min-w-0"><p className="text-[10px] md:text-xs font-bold text-gray-200 uppercase tracking-tight truncate">{item.nome}</p></div>
-                              <button onClick={() => abrirModalTroca(pedido.id, item)} className="text-[8px] md:text-[9px] font-bold uppercase border border-hb-gold bg-transparent text-hb-gold px-3 md:px-4 py-2 rounded hover:bg-hb-gold hover:text-black transition flex items-center justify-center gap-1 shrink-0">
-                                <RefreshCcw size={10} className="md:w-3 md:h-3" /> Solicitar
-                              </button>
-                            </div>
-                          ))}
+                          {pedido.itens?.map((item: any, idx: number) => {
+                            // 🚨 NOVA TRAVA VISUAL: Verifica se a troca já foi solicitada
+                            const jaSolicitouTroca = item.troca_solicitada || itensComTrocaSolicitada.includes(`${pedido.id}-${item.id}`)
+
+                            return (
+                              <div key={`troca-item-${idx}`} className="flex items-center gap-3 md:gap-4 border-b border-gray-800 pb-4 last:border-0 last:pb-0">
+                                <img src={item.foto} className="w-10 h-10 md:w-12 md:h-12 object-cover rounded border border-gray-800 shrink-0" />
+                                <div className="flex-1 min-w-0"><p className="text-[10px] md:text-xs font-bold text-gray-200 uppercase tracking-tight truncate">{item.nome}</p></div>
+                                
+                                {jaSolicitouTroca ? (
+                                  <span className="text-[8px] md:text-[9px] font-bold uppercase border border-gray-600 bg-transparent text-gray-500 px-3 md:px-4 py-2 rounded flex items-center justify-center gap-1 shrink-0 cursor-not-allowed">
+                                    Solicitada
+                                  </span>
+                                ) : (
+                                  <button onClick={() => abrirModalTroca(pedido.id, item)} className="text-[8px] md:text-[9px] font-bold uppercase border border-hb-gold bg-transparent text-hb-gold px-3 md:px-4 py-2 rounded hover:bg-hb-gold hover:text-black transition flex items-center justify-center gap-1 shrink-0">
+                                    <RefreshCcw size={10} className="md:w-3 md:h-3" /> Solicitar
+                                  </button>
+                                )}
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     </div>
