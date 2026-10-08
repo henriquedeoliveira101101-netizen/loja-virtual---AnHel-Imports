@@ -221,9 +221,10 @@ export default function MinhaConta() {
         body: JSON.stringify({ 
           pedidoId: pedidoIdSelecionado, 
           produtoId: itemSelecionado.id, 
-          usuarioId: (session?.user as any)?.id || null, // Correção do TypeScript aqui
+          usuarioId: (session?.user as any)?.id || null, 
           motivo, 
-          fotoUrl: urlFoto, 
+          // 👇 A MÁGICA AQUI: Se não tem foto do defeito, manda a foto do produto!
+          fotoUrl: urlFoto || itemSelecionado.foto, 
           precoProduto: itemSelecionado.preco || 0 
         })
       })
