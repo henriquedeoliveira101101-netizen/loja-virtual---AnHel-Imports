@@ -220,8 +220,8 @@ export default function MinhaConta() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           pedidoId: pedidoIdSelecionado, 
-          produtoId: itemSelecionado.id, // ID real do produto
-          usuarioId: session?.user?.id || null, // ID do usuário logado se existir
+          produtoId: itemSelecionado.id, 
+          usuarioId: (session?.user as any)?.id || null, // Correção do TypeScript aqui
           motivo, 
           fotoUrl: urlFoto, 
           precoProduto: itemSelecionado.preco || 0 
