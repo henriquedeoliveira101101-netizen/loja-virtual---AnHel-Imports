@@ -162,6 +162,10 @@ export async function POST(request: Request) {
       body: {
         items: preferenceItems,
         external_reference: String(pedidoSalvo.id),
+        
+        // 👇 AQUI ESTÁ A CORREÇÃO: O MERCADO PAGO AGORA SABE ONDE AVISAR 👇
+        notification_url: `${baseUrl}/api/webhooks/mercadopago`,
+        
         back_urls: {
           success: `${baseUrl}/sucesso`,
           failure: `${baseUrl}/carrinho`,
