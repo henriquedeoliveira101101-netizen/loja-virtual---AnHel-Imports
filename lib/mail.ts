@@ -47,7 +47,7 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
         </div>
         
         <div style="text-align: center;">
-          <a href="${process.env.NEXTAUTH_URL || 'https://loja-virtual-an-hel-imports.vercel.app'}/minha-conta" style="background: #000; color: #fff; padding: 16px 32px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Acompanhar Linha do Tempo</a>
+          <a href="${process.env.NEXTAUTH_URL || 'https://anhel-imports-rmpz4363y-an-hel-imports.vercel.app'}/minha-conta" style="background: #000; color: #fff; padding: 16px 32px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Acompanhar Linha do Tempo</a>
         </div>
       </div>
     `;
@@ -81,7 +81,7 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
   // ⭐ E-mail de Recuperação de Senha
   if (status === 'recuperacao') {
     assunto = "Recuperação de Senha - HB Importados";
-    const linkRecuperacao = `${process.env.NEXTAUTH_URL || 'https://loja-virtual-an-hel-imports.vercel.app'}/redefinir-senha?token=${dadoExtra}`;
+    const linkRecuperacao = `${process.env.NEXTAUTH_URL || 'https://anhel-imports-rmpz4363y-an-hel-imports.vercel.app'}/redefinir-senha?token=${dadoExtra}`;
     
     html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
