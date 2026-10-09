@@ -1,7 +1,13 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer'
 
-// Adicionamos um fallback para o build da Vercel não quebrar se a chave não estiver presente na compilação
-const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder_for_build');
+// Configuração do Gmail via Nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+})
 
 export async function enviarEmailStatus(email: string, nome: string, status: string, dadoExtra?: string) {
   let assunto = "";
@@ -14,6 +20,9 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
         <h1 style="font-weight: 300; text-transform: uppercase; text-align: center; letter-spacing: 2px;">HB IMPORTADOS</h1>
         <p>Olá, <strong>${nome}</strong>!</p>
         <p>Seu pedido foi confirmado com sucesso. Já estamos separando sua peça com todo carinho e cuidado. ✨</p>
+        <p style="background: #fdfaf3; padding: 15px; border-left: 3px solid #D4AF37; margin: 20px 0;">
+          💎 <strong>Você ganhou Cashback!</strong> Acabamos de adicionar 5% do valor desta compra como saldo em sua conta para você usar no seu próximo pedido.
+        </p>
         <p>Assim que a caixa for despachada, enviaremos um novo e-mail com o código de rastreio para você acompanhar.</p>
         <br/>
         <hr style="border: 0; border-top: 1px solid #eee;" />
@@ -24,7 +33,7 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
     `;
   }
 
-  if (status === 'postado') {
+  if (status === 'postado' || status === 'enviado') {
     assunto = "Sua encomenda foi postada! 🚀";
     html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
@@ -38,8 +47,33 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
         </div>
         
         <div style="text-align: center;">
-          <a href="https://loja-virtual-an-hel-imports.vercel.app/minha-conta" style="background: #000; color: #fff; padding: 16px 32px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Acompanhar Linha do Tempo</a>
+          <a href="${process.env.NEXTAUTH_URL || 'https://loja-virtual-an-hel-imports.vercel.app'}/minha-conta" style="background: #000; color: #fff; padding: 16px 32px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Acompanhar Linha do Tempo</a>
         </div>
+      </div>
+    `;
+  }
+
+  // ⭐ NOVO: E-mail de Troca Aprovada (Logística Reversa)
+  if (status === 'troca_aprovada') {
+    assunto = "Sua Troca foi Aprovada! (Código de Postagem) 📦";
+    html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+        <h1 style="font-weight: 300; text-transform: uppercase; text-align: center; letter-spacing: 2px;">HB IMPORTADOS</h1>
+        <p>Olá, <strong>${nome}</strong>.</p>
+        <p>A sua solicitação de troca/devolução foi <strong>aprovada</strong> pela nossa equipe!</p>
+        <p>Para nos enviar a joia de volta, vá até a agência dos Correios mais próxima e apresente o código de postagem reversa abaixo (a postagem é por nossa conta):</p>
+        
+        <div style="background: #f9f9f9; padding: 30px; text-align: center; border-radius: 8px; border: 1px solid #eee; margin: 30px 0;">
+          <p style="margin-bottom: 10px; font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold;">Código de Autorização:</p>
+          <strong style="font-size: 28px; letter-spacing: 6px; color: #000;">${dadoExtra}</strong>
+        </div>
+        
+        <p style="font-size: 14px; color: #555;">Por favor, embale o produto na caixa original, sem indícios de uso, com todos os acessórios acompanhantes.</p>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin-top: 40px;" />
+        <p style="font-size: 11px; color: #999; text-align: center; margin-top: 20px;">
+          Em caso de dúvidas, responda a este e-mail.
+        </p>
       </div>
     `;
   }
@@ -67,18 +101,22 @@ export async function enviarEmailStatus(email: string, nome: string, status: str
     `;
   }
 
-  // Tenta enviar o e-mail (com proteção contra erros)
+  // Se o status não for nenhum desses, não faz nada
+  if (!assunto) return { sucesso: false, error: 'Status de e-mail inválido.' };
+
+  // Tenta enviar o e-mail usando o Gmail (Nodemailer)
   try {
-    const data = await resend.emails.send({
-      from: 'HB Importados <onboarding@resend.dev>', // Use este remetente para testes
+    const info = await transporter.sendMail({
+      from: `"HB Importados" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: assunto,
       html: html,
     });
-    console.log("RESPOSTA DO RESEND:", data);
-    return { sucesso: true, data };
+    
+    console.log("✅ E-mail enviado com sucesso:", info.messageId);
+    return { sucesso: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Erro ao enviar e-mail:", error);
+    console.error("❌ Erro ao enviar e-mail via Gmail:", error);
     return { sucesso: false, error };
   }
 }
