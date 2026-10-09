@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ShieldAlert, RefreshCcw, Search, Image as ImageIcon, Truck, Ticket } from 'lucide-react'
+import { ShieldAlert, RefreshCcw, Search, Image as ImageIcon, Truck, Ticket, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 export default function TelaDevolucoes() {
   const [solicitacoes, setSolicitacoes] = useState<any[]>([])
   const [carregando, setCarregando] = useState(true)
   const [rastreioInput, setRastreioInput] = useState<{ [key: string]: string }>({})
+  const [enviandoEmailId, setEnviandoEmailId] = useState<string | null>(null) // Para o ícone de carregando do botão
 
   useEffect(() => {
     carregarTrocas()
@@ -15,17 +16,22 @@ export default function TelaDevolucoes() {
 
   async function carregarTrocas() {
     try {
+      // Puxamos a troca e cruzamos com a tabela de usuários para pegar nome e e-mail reais
       const { data, error } = await supabase
         .from('trocas')
-        .select('*')
+        .select('*, usuarios(nome, email)')
         .order('criado_em', { ascending: false })
 
       if (error) throw error
 
       const trocasCompletas = (data || []).map(troca => ({
         ...troca,
-        cliente: { nome: 'Cliente Exemplo', historico_trocas: Math.floor(Math.random() * 4) },
-        produto: { nome: 'Anel Solitário', preco: 199.90 }
+        cliente: { 
+          nome: troca.usuarios?.nome || 'Cliente AnHel', 
+          email: troca.usuarios?.email || '',
+          historico_trocas: 0 // (Opcional) Podemos cruzar dados reais depois
+        },
+        produto: { nome: 'Produto AnHel Imports', preco: 199.90 } // Preço genérico para a troca
       }))
 
       setSolicitacoes(trocasCompletas)
@@ -41,27 +47,42 @@ export default function TelaDevolucoes() {
       const { error } = await supabase.from('trocas').update({ status: novoStatus }).eq('id', id)
       if (error) throw error
       setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: novoStatus } : s))
-      alert(`Status updated to: ${novoStatus.toUpperCase()}`)
+      alert(`Status atualizado para: ${novoStatus.toUpperCase()}`)
     } catch (error) {
-      alert("Error updating status.")
+      alert("Erro ao atualizar status.")
     }
   }
 
-  const salvarRastreioReverso = async (id: string) => {
+  // 🚨 NOVA FUNÇÃO DE RASTREIO QUE ENVIA O E-MAIL 🚨
+  const salvarRastreioReverso = async (id: string, emailCliente: string, nomeCliente: string) => {
     const codigo = rastreioInput[id]
-    if (!codigo || codigo.length < 13) {
+    if (!codigo || codigo.length < 5) {
       alert("Digite um código de rastreio válido (Ex: QQ123456789BR)")
       return
     }
 
+    setEnviandoEmailId(id)
+
     try {
+      // 1. Muda status no banco
       const { error } = await supabase.from('trocas').update({ status: 'aguardando_retorno' }).eq('id', id)
       if (error) throw error
       
+      // 2. Dispara o E-mail Elegante
+      if (emailCliente) {
+        await fetch('/api/trocas/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailCliente, nome: nomeCliente, codigoRastreio: codigo })
+        })
+      }
+      
       setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'aguardando_retorno' } : s))
-      alert(`Logística Reversa gerada! Código enviado ao cliente.`)
+      alert(`Logística Reversa gerada! O código foi enviado para o e-mail do cliente.`)
     } catch (error) {
-      alert("Erro ao salvar rastreio.")
+      alert("Erro ao salvar rastreio e notificar cliente.")
+    } finally {
+      setEnviandoEmailId(null)
     }
   }
 
@@ -126,9 +147,8 @@ export default function TelaDevolucoes() {
               </div>
 
               <div className="flex-1">
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Pedido / Produto</p>
-                <p className="text-sm text-white font-medium">{solicitacao.pedido_id}</p>
-                <p className="text-xs text-gray-400">{solicitacao.produto.nome} - R$ {solicitacao.produto.preco.toFixed(2)}</p>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Pedido / ID</p>
+                <p className="text-xs text-white font-medium break-all">{solicitacao.pedido_id}</p>
                 <div className="mt-3 inline-block bg-hb-black px-3 py-1 rounded-full border border-gray-800">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                     Motivo: {solicitacao.motivo}
@@ -139,9 +159,9 @@ export default function TelaDevolucoes() {
               <div className="w-full md:w-auto flex justify-center">
                 {solicitacao.foto_url ? (
                   <a href={solicitacao.foto_url} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center gap-2 cursor-pointer">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-700 bg-hb-black relative">
-                      <img src={solicitacao.foto_url} alt="Defeito" className="w-full h-full object-cover group-hover:opacity-40 transition duration-300" />
-                      <ImageIcon size={16} className="absolute inset-0 m-auto text-hb-gold opacity-0 group-hover:opacity-100 transition" />
+                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-700 bg-hb-black relative flex items-center justify-center">
+                      <img src={solicitacao.foto_url} alt="Item" className="w-full h-full object-cover group-hover:opacity-40 transition duration-300" />
+                      <ImageIcon size={16} className="absolute m-auto text-hb-gold opacity-0 group-hover:opacity-100 transition" />
                     </div>
                     <span className="text-[9px] font-bold uppercase tracking-widest text-hb-gold group-hover:text-hb-goldLight">Ver Foto</span>
                   </a>
@@ -174,13 +194,18 @@ export default function TelaDevolucoes() {
                    <div className="flex flex-col gap-2 w-full mt-2">
                      <input 
                        type="text" 
-                       placeholder="Cód. Rastreio (Ex: QQ123BR)" 
+                       placeholder="Cód. Postagem (Ex: QQ123BR)" 
                        className="bg-hb-black border border-gray-700 rounded p-2 text-xs text-white w-full uppercase outline-none focus:border-hb-gold placeholder-gray-600"
                        value={rastreioInput[solicitacao.id] || ''}
                        onChange={(e) => setRastreioInput({...rastreioInput, [solicitacao.id]: e.target.value.toUpperCase()})}
                      />
-                     <button onClick={() => salvarRastreioReverso(solicitacao.id)} className="w-full bg-hb-black border border-gray-700 text-white text-[10px] py-2 rounded font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:border-hb-gold hover:text-hb-gold transition">
-                       <Truck size={14} className="text-hb-gold" /> Enviar Reversa
+                     <button 
+                        onClick={() => salvarRastreioReverso(solicitacao.id, solicitacao.cliente.email, solicitacao.cliente.nome)} 
+                        disabled={enviandoEmailId === solicitacao.id}
+                        className="w-full bg-hb-black border border-gray-700 text-white text-[10px] py-2 rounded font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:border-hb-gold hover:text-hb-gold transition disabled:opacity-50"
+                     >
+                       {enviandoEmailId === solicitacao.id ? <Loader2 size={14} className="animate-spin text-hb-gold" /> : <Truck size={14} className="text-hb-gold" />} 
+                       Enviar Reversa
                      </button>
                    </div>
                 )}

@@ -33,6 +33,9 @@ export async function POST(request: Request) {
     let statusTroca = 'analise_pendente'
     let cupomGerado = null
 
+    // 👇 CÓDIGO DESATIVADO: Comentamos esta parte para garantir que TUDO vá para a sua análise manual!
+    // Você vai verificar a foto de defeito lá no painel Admin primeiro.
+    /*
     if (motivo === 'defeito' && precoProduto <= limiteAutoAprovacao && !clienteSuspeito) {
       statusTroca = 'aprovado_automatico'
       
@@ -49,6 +52,7 @@ export async function POST(request: Request) {
 
       cupomGerado = { codigo: codigoCupom, valor: valorComBonus }
     }
+    */
 
     // 3. Registra a solicitação na tabela de Trocas
     const { data: novaTroca, error: erroInsert } = await supabase
